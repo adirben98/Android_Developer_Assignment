@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/usersListFragment">
+
+    <fragment
+        android:id="@+id/usersListFragment"
+        android:name="com.example.android_developer_assignment.ui.UsersListFragment"
+        android:label=""
+        tools:layout="@layout/fragment_user_list" >
+        <action
+            android:id="@+id/action_usersListFragment_to_editUserFragment"
+            app:destination="@id/editUserFragment" />
+        <action
+            android:id="@+id/action_usersListFragment_to_addUserFragment"
+            app:destination="@id/addUserFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editUserFragment"
+        android:name="com.example.android_developer_assignment.ui.EditUserFragment"
+        android:label=""
+        tools:layout="@layout/edit_user_fragment" >
+        <argument
+            android:name="id"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/addUserFragment"
+        android:name="com.example.android_developer_assignment.ui.AddUserFragment"
+        android:label=""
+        tools:layout="@layout/fragment_add_user" />
+</navigation>

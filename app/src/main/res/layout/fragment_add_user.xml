@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F2F2"
+    tools:context=".ui.AddUserFragment">
+
+<TextView
+android:id="@+id/textView"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_marginTop="26dp"
+android:text="New User"
+android:textSize="28sp"
+android:textColor="#333333"
+    android:textStyle="bold"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+
+<ImageView
+android:id="@+id/avatar"
+android:layout_width="160dp"
+android:layout_height="160dp"
+android:layout_marginTop="40dp"
+android:src="@drawable/avatar"
+android:scaleType="centerCrop"
+android:backgroundTint="#FFFFFF"
+    android:elevation="4dp"
+    android:layout_marginBottom="16dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/textView" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/avatar">
+
+        <ImageButton
+            android:id="@+id/camera_btn"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Take Photo"
+            android:src="@drawable/camera_icon"
+            android:tint="#6C92F4" />
+
+        <ImageButton
+            android:id="@+id/gallery"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Select from Gallery"
+            android:src="@drawable/gallery_icon"
+            android:tint="#6C92F4" />
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/email"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:backgroundTint="#FFFFFF"
+        android:hint="Email"
+        android:textColor="#333333"
+        android:textColorHint="#999999"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintWidth_percent="0.85" />
+
+<com.google.android.material.textfield.TextInputEditText
+android:id="@+id/firstName"
+android:layout_width="0dp"
+android:layout_height="wrap_content"
+android:hint="First Name"
+android:backgroundTint="#FFFFFF"
+    android:textColor="#333333"
+    android:textColorHint="#999999"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/email"
+    app:layout_constraintWidth_percent="0.85"
+    android:layout_marginTop="16dp" />
+
+<com.google.android.material.textfield.TextInputEditText
+android:id="@+id/lastName"
+android:layout_width="0dp"
+android:layout_height="wrap_content"
+android:hint="Last Name"
+android:backgroundTint="#FFFFFF"
+    android:textColor="#333333"
+    android:textColorHint="#999999"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/firstName"
+    app:layout_constraintWidth_percent="0.85"
+    android:layout_marginTop="16dp" />
+
+<Button
+android:id="@+id/add_btn"
+android:layout_width="0dp"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:layout_marginBottom="32dp"
+android:backgroundTint="#6C92F4"
+    android:text="Add"
+    android:textColor="#FFFFFF"
+    android:textStyle="bold"
+    app:layout_constraintWidth_percent="0.85"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/lastName" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
