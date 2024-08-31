@@ -1,5 +1,6 @@
 package com.example.android_developer_assignment.ui;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.android_developer_assignment.Model.Model;
 import com.example.android_developer_assignment.Model.User;
@@ -24,6 +26,7 @@ import com.example.android_developer_assignment.R;
 import com.example.android_developer_assignment.databinding.FragmentUserListBinding;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
@@ -44,6 +47,21 @@ public class UsersListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentUserListBinding.inflate(inflater, container, false);
+        viewModel.getError().observe(getViewLifecycleOwner(), error -> {
+            if (Objects.equals(error, ""))return;
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Error")
+                    .setMessage("It seems that your connection to the internet is offline.")
+                    .setPositiveButton("Ok", (dialog,which)->{
+                    })
+                    .create().show();        });
+        Model.instance().EventFeedLoadingState.observe(getViewLifecycleOwner(),status->{
+            binding.SwipeRefresh.setRefreshing(status == Model.LoadingState.Loading);
+
+        });
+        binding.SwipeRefresh.setOnRefreshListener(() -> {
+            Model.instance().refresh();
+        });
         binding.userList.setHasFixedSize(true);
         binding.userList.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -60,6 +78,7 @@ public class UsersListFragment extends Fragment {
         viewModel.getUsers().observe(getViewLifecycleOwner(), users -> {
             adapter.setData(users);
         });
+
 
         new ItemTouchHelper(simpleCallback).attachToRecyclerView(binding.userList);
 

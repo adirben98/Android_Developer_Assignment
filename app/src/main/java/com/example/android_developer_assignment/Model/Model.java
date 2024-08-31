@@ -8,6 +8,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.core.os.HandlerCompat;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.android_developer_assignment.Model.Retrofit.ReqResResponse;
 import com.example.android_developer_assignment.Model.Retrofit.RequestUsers;
@@ -34,8 +35,12 @@ public class Model {
     private Executor executor = Executors.newSingleThreadExecutor();
     FirebaseStorage storage = FirebaseStorage.getInstance();
     private Handler mainHandler = HandlerCompat.createAsync(Looper.getMainLooper());
+    final public MutableLiveData<LoadingState> EventFeedLoadingState=new MutableLiveData<>(LoadingState.Not_Loading);
 
-
+    public enum LoadingState{
+        Loading,
+        Not_Loading
+    }
     public static Model instance() {
         return model;
     }
@@ -49,41 +54,72 @@ public class Model {
     }
 
     LiveData<List<User>> users;
+    MutableLiveData<String> error = new MutableLiveData<>("");
+
+    void setError(String error) {
+        this.error.postValue(error);
+    }
+
+    public MutableLiveData<String> getError() {
+        return error;
+    }
+    public void refresh(){
+        EventFeedLoadingState.setValue(LoadingState.Loading);
+
+        if (!User.IsUpdated()) {
+            fetchUsersFromNetwork();
+        }
+        else{
+            EventFeedLoadingState.setValue(LoadingState.Not_Loading);
+
+        }
+    }
 
     public LiveData<List<User>> getUsers() {
         if (users == null) {
             users = localDb.userDao().getAll();
         }
 
-        if (!User.IsUpdated()) {
-            fetchUsersFromNetwork();
-        }
+        refresh();
 
         return users;
     }
 
     private void fetchUsersFromNetwork() {
-        RequestUsers request = RetrofitClient.getClient().create(RequestUsers.class);
-        request.getUsers().enqueue(new Callback<ReqResResponse>() {
-            @Override
-            public void onResponse(Call<ReqResResponse> call, Response<ReqResResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<User> usersList = response.body().getData();
-                    executor.execute(() -> {
-                        localDb.userDao().insertAll(usersList.toArray(new User[0]));
-
-                    });
-
-                    User.setIsUpdated(true);
+        EventFeedLoadingState.setValue(LoadingState.Loading); // Start loading state
+        for (int i = 1; i < 3; i++) {
+            RequestUsers request = RetrofitClient.getClient().create(RequestUsers.class);
+            int finalI = i;
+            request.getUsers(i).enqueue(new Callback<ReqResResponse>() {
+                @Override
+                public void onResponse(Call<ReqResResponse> call, Response<ReqResResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<User> usersList = response.body().getData();
+                        executor.execute(() -> {
+                            localDb.userDao().insertAll(usersList.toArray(new User[0]));
+                        });
+                        User.setIsUpdated(true);
+                    }
+                    checkIfLoadingComplete(finalI); // Check if the loading should be marked as complete
                 }
-            }
 
-            @Override
-            public void onFailure(Call<ReqResResponse> call, Throwable throwable) {
-                System.out.println(throwable.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Call<ReqResResponse> call, Throwable throwable) {
+                    mainHandler.post(() -> {
+                        setError("Failed to fetch users");
+                        checkIfLoadingComplete(finalI); // Handle error case
+                    });
+                }
+            });
+        }
     }
+
+    private void checkIfLoadingComplete(int currentIndex) {
+        if (currentIndex == 2) { // Assuming 2 is the last page index
+            mainHandler.post(() -> EventFeedLoadingState.setValue(LoadingState.Not_Loading));
+        }
+    }
+
 
     LiveData<User> user;
 
@@ -91,24 +127,26 @@ public class Model {
         user = localDb.userDao().findById(id);
         return user;
     }
+
     public void insert(User user, Listener<Void> listener) {
-        System.out.println(user.getId());
+        EventFeedLoadingState.postValue(LoadingState.Loading);
         executor.execute(() -> {
             localDb.userDao().insertAll(user);
-            mainHandler.post(()->{
+            mainHandler.post(() -> {
                 listener.onComplete(null);
+                EventFeedLoadingState.postValue(LoadingState.Not_Loading);
             });
         });
     }
-    public int generateNewId(){
-        int randomId=0;
+
+    public int generateNewId() {
+        int randomId = 0;
 
         try {
             do {
                 randomId = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
             } while (localDb.userDao().checkIfIdExists(randomId) > 0);
-        }
-        catch (Throwable t){
+        } catch (Throwable t) {
 
         }
         return randomId;
